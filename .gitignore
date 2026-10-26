@@ -1,0 +1,4 @@
+watcher/.out/
+watcher/.cache/
+node_modules/
+private/

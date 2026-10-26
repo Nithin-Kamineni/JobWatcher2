@@ -1,0 +1,102 @@
+name: Job watcher
+
+# Polls company career sites for PhD hardware internships, three times a day.
+# The watcher code and target list are maintained in a private repo (PRIVATE_REPO) and copied here at the start of
+# every run (company note columns blanked). Results are committed here and to the private repo, where a local
+# dashboard imports jobs/inbox/*.jsonl. Needs the secret PRIVATE_REPO_TOKEN: a fine-grained token for PRIVATE_REPO
+# with Contents and Issues read/write.
+
+on:
+  schedule:
+    # Off the full hour (GitHub delays or skips scheduled runs most at :00), timed around when postings go live:
+    # most target companies post during Pacific business hours. Times are UTC; after DST ends (Nov 1) each is 1 h earlier in Eastern.
+    - cron: "37 11 * * *"  # 7:37 am Eastern (EDT): overnight / previous evening + East-coast early posts
+    - cron: "37 17 * * *"  # 1:37 pm Eastern (EDT) = 10:37 am Pacific: the Pacific morning peak
+    - cron: "37 23 * * *"  # 7:37 pm Eastern (EDT) = 4:37 pm Pacific: the rest of the Pacific workday
+  workflow_dispatch:
+    inputs:
+      reset:
+        description: "Forget seen jobs and report everything again"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: job-watcher
+  cancel-in-progress: false
+
+env:
+  PRIVATE_REPO: Nithin-Kamineni/JobWatcher
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90  # complete scans (no page caps) plus up to 200 descriptions per company
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check out the private repo (watcher code + inbox only)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.PRIVATE_REPO }}
+          token: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          path: private
+          sparse-checkout: |
+            watcher
+            targets/companies.csv
+            jobs/inbox
+            jobs/digests
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Copy the latest watcher code
+        run: |
+          # Code and keywords come from the private repo; watcher/state stays this repo's own.
+          rsync -a --delete private/watcher/lib/ watcher/lib/
+          cp private/watcher/watch.js private/watcher/keywords.json private/watcher/package.json watcher/
+          node .github/scripts/copy-companies.mjs private/targets/companies.csv targets/companies.csv
+
+      - name: Run watcher
+        run: node watcher/watch.js ${{ inputs.reset && '--reset' || '' }}
+
+      - name: Commit to the private repo (the dashboard imports from there)
+        run: |
+          mkdir -p private/watcher/state private/jobs/inbox private/jobs/digests
+          cp watcher/state/*.json private/watcher/state/
+          cp jobs/inbox/*.jsonl private/jobs/inbox/ 2>/dev/null || true
+          cp jobs/digests/*.md private/jobs/digests/ 2>/dev/null || true
+          cd private
+          git config user.name "job-watcher[bot]"
+          git config user.email "job-watcher@users.noreply.github.com"
+          git add watcher/state jobs/digests jobs/inbox
+          if git diff --cached --quiet; then echo "Nothing to commit"; exit 0; fi
+          git commit -m "Job watcher: $(cat ../watcher/.out/count.txt) new match(es)"
+          git pull --rebase --autostash
+          git push
+
+      # After the private push: if that fails, the jobs stay unseen here and the next run reports them again.
+      - name: Commit state, digest and inbox here
+        run: |
+          git config user.name "job-watcher[bot]"
+          git config user.email "job-watcher@users.noreply.github.com"
+          git add watcher targets jobs
+          if git diff --cached --quiet; then echo "Nothing to commit"; exit 0; fi
+          git commit -m "Job watcher: $(cat watcher/.out/count.txt) new match(es)"
+          git pull --rebase --autostash
+          git push
+
+      - name: Open an issue in the private repo for new matches (GitHub emails you)
+        env:
+          GH_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
+        run: |
+          n=$(cat watcher/.out/count.txt)
+          if [ "$n" -gt 0 ]; then
+            gh label create jobs -R "$PRIVATE_REPO" --color 1D76DB --description "Job watcher digests" 2>/dev/null || true
+            printf '\n\ncc @%s\n' "${{ github.repository_owner }}" >> watcher/.out/issue.md
+            gh issue create -R "$PRIVATE_REPO" --title "$n new job match(es) – $(date -u +'%Y-%m-%d %H:%M') UTC" --label jobs --body-file watcher/.out/issue.md
+          fi
