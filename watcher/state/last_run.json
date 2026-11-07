@@ -1,8 +1,8 @@
 {
-  "at": "2026-11-07T16:58:16.890Z",
-  "matches": 1,
-  "digest": "jobs/digests/2026-11-07_1658.md",
-  "inbox": "jobs/inbox/2026-11-07_1658.jsonl",
+  "at": "2026-11-07T21:04:07.945Z",
+  "matches": 0,
+  "digest": null,
+  "inbox": null,
   "errors": [
     "Fractile (greenhouse): HTTP 404 for https://boards-api.greenhouse.io/v1/boards/fractile/jobs?content=true"
   ],
@@ -12,16 +12,16 @@
     "Intel: 865 listed, 0 new matches",
     "Samsung Semiconductor (US / SAIT America): 626 listed, 0 new matches",
     "SK hynix America: 49 listed, 0 new matches",
-    "Micron: 2890 listed, 0 new matches",
-    "Qualcomm: 2038 listed, 0 new matches",
-    "IBM Research: 751 listed, 0 new matches",
-    "Cadence: 699 listed, 0 new matches",
-    "Synopsys: 679 listed, 0 new matches",
+    "Micron: 2889 listed, 0 new matches",
+    "Qualcomm: 2075 listed, 0 new matches",
+    "IBM Research: 750 listed, 0 new matches",
+    "Cadence: 700 listed, 0 new matches",
+    "Synopsys: 678 listed, 0 new matches",
     "EnCharge AI: 28 listed, 0 new matches",
     "d-Matrix: 38 listed, 0 new matches",
     "Google: 2414 listed, 0 new matches",
     "Apple: 24 listed, 0 new matches",
-    "Microsoft: 2373 listed, 0 new matches",
+    "Microsoft: 2369 listed, 0 new matches",
     "Amazon / AWS (Annapurna Labs): 2500 listed, 0 new matches",
     "Arm: 465 listed, 0 new matches",
     "Marvell: 351 listed, 0 new matches",
@@ -38,7 +38,7 @@
     "SiFive: 132 listed, 0 new matches",
     "Mythic: 29 listed, 0 new matches",
     "Texas Instruments: 905 listed, 0 new matches",
-    "Analog Devices: 822 listed, 0 new matches",
+    "Analog Devices: 820 listed, 0 new matches",
     "Positron: 23 listed, 0 new matches",
     "Lemurian Labs: 6 listed, 0 new matches",
     "Axelera AI: 10 listed, 0 new matches",
@@ -46,7 +46,7 @@
     "Anthropic: 675 listed, 0 new matches",
     "xAI: 303 listed, 0 new matches",
     "Cohere: 124 listed, 0 new matches",
-    "SimplifyJobs: 3745 relevant-category listings, 1 new matches"
+    "SimplifyJobs: 3743 relevant-category listings, 0 new matches"
   ],
   "manual": [
     "Meta",
@@ -60,11 +60,11 @@
     "Intel": 865,
     "Samsung Semiconductor (US / SAIT America)": 626,
     "SK hynix America": 49,
-    "Micron": 2890,
-    "Qualcomm": 2038,
-    "IBM Research": 751,
-    "Cadence": 699,
-    "Synopsys": 679,
+    "Micron": 2889,
+    "Qualcomm": 2075,
+    "IBM Research": 750,
+    "Cadence": 700,
+    "Synopsys": 678,
     "EnCharge AI": 28,
     "d-Matrix": 38,
     "Google": 2414,
@@ -85,7 +85,7 @@
     "SiFive": 132,
     "Mythic": 29,
     "Texas Instruments": 905,
-    "Analog Devices": 822,
+    "Analog Devices": 820,
     "Positron": 23,
     "Lemurian Labs": 6,
     "Axelera AI": 10,
@@ -94,6 +94,6 @@
     "Anthropic": 675,
     "xAI": 303,
     "Cohere": 124,
-    "Microsoft": 2373
+    "Microsoft": 2369
   }
 }
